@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 #-*- code:utf-8 -*-
-require 'nokogiri'
+require 'terminal-table'
 require 'open-uri'
 require 'rest-client'
 require './terminal_color'
@@ -17,7 +17,8 @@ class GetStock
   end
 
   def get_stock_price
-    puts "%-10s %-10s %-10s %-10s %-10s %-10s %-10s %-10s %-10s %-10s %-10s" % ["#{BColor::WHITE}代码", "名称", "昨收", "今开", "最高", "最低", "现价", "涨幅", "浮动数额", "盈亏比例", "成本金额#{BColor::ENDC}"]
+    row = []
+    row << ["#{BColor::WHITE}代码", "名称", "昨收", "今开", "最高", "最低", "现价", "涨幅", "浮动数额", "盈亏比例", "成本金额#{BColor::ENDC}"]
     html  =  RestClient.get("#{@base_url}#{@stock_str}").body
     html = html.encode('utf-8', 'gb2312')
     lines = html.split("\n")
@@ -59,30 +60,13 @@ class GetStock
           stockRatio = ( '%+.2f' % ( (yersterdayEndPrice / stockCost - 1) * 100 ) ) + '%'
           floatMoneyColor = highOrLow(yersterdayEndPrice, stockCost)
         end
-        puts "shamgin"
-        puts "%-10s %-10s %-10s %-10s %-10s %-10s %-10s %-10s %-10s" % \
-        ["#{BColor::WHITE}#{code}#{BColor::ENDC}",
-         "#{BColor::WHITE}#{name}#{BColor::ENDC}",
-         "#{BColor::WHITE}#{yersterdayEndPrice}#{BColor::ENDC}",
-         "#{todayBeginPriceColor}#{todayBeginPrice}#{BColor::ENDC}",
-         "#{todayMaxPriceColor}#{todayMaxPrice}#{BColor::ENDC}",
-         "#{todayBeginPriceColor}#{todayMinPrice}#{BColor::ENDC}",
-         "#{currentPriceColor}#{currentPrice}#{per}#{BColor::ENDC}",
-         "#{floatMoneyColor}#{floatMoney}#{stockRatio}#{BColor::ENDC}",
-         "#{BColor::WHITE}#{stockQuantity}#{BColor::ENDC}"]
+        row << ["#{BColor::WHITE}#{code}#{BColor::ENDC}","#{BColor::WHITE}#{name}#{BColor::ENDC}","#{BColor::WHITE}#{yersterdayEndPrice}#{BColor::ENDC}","#{todayBeginPriceColor}#{todayBeginPrice}#{BColor::ENDC}","#{todayMaxPriceColor}#{todayMaxPrice}#{BColor::ENDC}","#{todayBeginPriceColor}#{todayMinPrice}#{BColor::ENDC}","#{currentPriceColor}#{currentPrice}#{BColor::ENDC}","#{currentPriceColor}#{per}#{BColor::ENDC}","#{floatMoneyColor}#{floatMoney}#{stockRatio}#{BColor::ENDC}","#{BColor::WHITE}#{stockQuantity}#{BColor::ENDC}"]
       else
-        puts "xiamian"
-        puts "%-10s %-10s %-10s %-10s %-10s %-10s %-10s" % \
-        ["#{BColor::WHITE}#{code}#{BColor::ENDC}",
-         "#{BColor::WHITE}#{name}#{BColor::ENDC}",
-         "#{BColor::WHITE}#{yersterdayEndPrice}#{BColor::ENDC}",
-         "#{todayBeginPriceColor}#{todayBeginPrice}#{BColor::ENDC}",
-         "#{todayMaxPriceColor}#{todayMaxPrice}#{BColor::ENDC}",
-         "#{todayBeginPriceColor}#{todayMinPrice}#{BColor::ENDC}",
-         "#{currentPriceColor}#{currentPrice}#{per}#{BColor::ENDC}"]
+        row << ["#{BColor::WHITE}#{code}#{BColor::ENDC}","#{BColor::WHITE}#{name}#{BColor::ENDC}","#{BColor::WHITE}#{yersterdayEndPrice}#{BColor::ENDC}","#{todayBeginPriceColor}#{todayBeginPrice}#{BColor::ENDC}","#{todayMaxPriceColor}#{todayMaxPrice}#{BColor::ENDC}","#{todayBeginPriceColor}#{todayMinPrice}#{BColor::ENDC}","#{currentPriceColor}#{currentPrice}#{BColor::ENDC}","#{currentPriceColor}#{per}#{BColor::ENDC}","-","-","-"]
       end
 
     end
+    puts Terminal::Table.new :rows => row
     # puts html = html.encode('utf-8', 'gb2312')
     # puts "#{BColor::RED} this is red #{BColor::ENDC}"
   end
